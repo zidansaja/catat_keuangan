@@ -8,12 +8,24 @@ class NotifListener : NotificationListenerService() {
 
     private var lastKey = ""
 
-    // Hanya notifikasi yang memuat nominal uang yang disimpan, supaya chat pribadi tidak ikut tercatat.
+    // Aplikasi yang jelas bukan transaksi (chat, email, medsos, promo trading) dilewati.
+    private val blockedPrefixes = listOf(
+        "com.whatsapp",
+        "com.google.android.gm",
+        "org.telegram",
+        "com.instagram",
+        "com.facebook",
+        "com.zhiliaoapp.musically",
+        "com.EmasDigi"
+    )
+
+    // Hanya notifikasi yang memuat nominal uang yang disimpan.
     private val moneyPattern =
         Regex("(\\bRp\\.?\\s?\\d|\\bIDR\\b|\\bUSD\\b|\\$\\s?\\d)", RegexOption.IGNORE_CASE)
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         if (sbn.packageName == packageName) return
+        if (blockedPrefixes.any { sbn.packageName.startsWith(it) }) return
 
         val extras = sbn.notification.extras
         val title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString() ?: ""
