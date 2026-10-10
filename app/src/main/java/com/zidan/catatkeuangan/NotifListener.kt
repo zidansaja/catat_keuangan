@@ -40,5 +40,8 @@ class NotifListener : NotificationListenerService() {
         lastKey = key
 
         NotifStore.add(this, sbn.packageName, title, body)
+
+        val parsed = Parser.parse(sbn.packageName, title, body)
+        if (parsed != null) NotifStore.addTrx(this, parsed)
     }
 }
